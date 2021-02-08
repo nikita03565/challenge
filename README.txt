@@ -10,4 +10,4 @@ python download.py "Form W-2" 2015 2021
 
 Assumptions that were made:
 - the latest version of title is included in output json
-- strict equality is used for form name comparison, i.e.  if "Form W-2" is given "Form W-2 P" would be ignored
+- strict case insensitive equality is used for form name comparison, i.e.  if "Form W-2" is given "Form W-2 P" would be ignored

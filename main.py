@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import sys
 
-from utils import parse_table, to_json
+from utils import parse_table, to_json, get_next_link
 
 path = 'C:\Program Files (x86)\Selenium\chromedriver.exe'
 driver = webdriver.Chrome(path)
@@ -13,14 +13,24 @@ search_terms = sys.argv[1:]
 
 driver.get(url)
 
-for term in search_terms:  # TODO листать страницы
+res_json = []
+for term in search_terms:
+    res = []
     search = driver.find_element_by_id("searchFor")
     search.clear()
     search.send_keys(term)
     search.send_keys(Keys.RETURN)
-    res = parse_table(driver.page_source)
-    print(to_json(res, term))
+    while True:
+        res.extend(parse_table(driver.page_source))
+        next_link = get_next_link(driver)
+        if next_link is None:
+            break
+        driver.get(next_link)
+    json = to_json(res, term)
+    if json is not None:
+        res_json.append(json)
 
+print(res_json)
 driver.close()
 
 

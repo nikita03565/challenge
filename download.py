@@ -32,3 +32,5 @@ for f in filtered:
     r = requests.get(f['link'])
     with open(f'{term}/{f["form_number"]} - {f["year"]}.pdf', 'wb') as f:
         f.write(r.content)
+
+driver.close()

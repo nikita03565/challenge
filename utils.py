@@ -15,8 +15,15 @@ def parse_table(html):
     return res
 
 
+def get_next_link(driver):
+    pagination = driver.find_element_by_class_name('paginationBottom')
+    pagination_links = pagination.find_elements_by_tag_name('a')
+    next_link = pagination_links[-1].get_attribute('href') if pagination_links and 'Next' in pagination_links[-1].text else None
+    return next_link
+
+
 def to_json(data, term):
-    filtered = [d for d in data if d['form_number'] == term]
+    filtered = [d for d in data if d['form_number'].lower() == term.lower()]
     if not filtered:
         return None
     min_year = min(f['year'] for f in filtered)
