@@ -16,18 +16,20 @@ url = 'https://apps.irs.gov/app/picklist/list/priorFormPublication.html;jsession
 # end_year = 2021
 try:
     term, start_year, end_year = sys.argv[1:]
+    start_year = int(start_year)
+    end_year = int(end_year)
 except ValueError as e:
     sys.exit('Invalid input')
 
 driver.get(url)
-search = driver.find_element_by_id("searchFor")
+search = driver.find_element_by_id('searchFor')
 search.clear()
 search.send_keys(term)
 search.send_keys(Keys.RETURN)
 res = parse_table(driver.page_source)
-filtered = [rec for rec in res if rec['form_number'] == term and start_year <= rec['year'] <= end_year]
+filtered = [rec for rec in res if rec['form_number'].lower() == term.lower() and start_year <= rec['year'] <= end_year]
 
-os.makedirs(term, exist_ok=True)
+os.makedirs(filtered[0]['form_number'], exist_ok=True)
 for f in filtered:
     r = requests.get(f['link'])
     with open(f'{term}/{f["form_number"]} - {f["year"]}.pdf', 'wb') as f:
