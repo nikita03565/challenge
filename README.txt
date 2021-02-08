@@ -4,6 +4,7 @@ Initial setup steps:
 1. python -m venv venv
 2. source venv/bin/activate
 3. pip install -r requirements.txt
+4. Install chrome webdriver and add it in your PATH
 
 Now you can run scripts.
 

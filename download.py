@@ -7,8 +7,7 @@ from selenium.webdriver.common.keys import Keys
 
 from utils import parse_table
 
-path = 'C:\Program Files (x86)\Selenium\chromedriver.exe'
-driver = webdriver.Chrome(path)
+driver = webdriver.Chrome()
 url = 'https://apps.irs.gov/app/picklist/list/priorFormPublication.html;jsessionid=fc15GG-KNts4sTUfTXSuaSBE.20?resultsPerPage=200&sortColumn=sortOrder&indexOfFirstRow=0&criteria=&value=&isDescending=false'
 
 # term = "Form W-2"
