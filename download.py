@@ -1,4 +1,5 @@
 import os
+import sys
 
 import requests
 from selenium import webdriver
@@ -10,9 +11,13 @@ path = 'C:\Program Files (x86)\Selenium\chromedriver.exe'
 driver = webdriver.Chrome(path)
 url = 'https://apps.irs.gov/app/picklist/list/priorFormPublication.html;jsessionid=fc15GG-KNts4sTUfTXSuaSBE.20?resultsPerPage=200&sortColumn=sortOrder&indexOfFirstRow=0&criteria=&value=&isDescending=false'
 
-term = "Form W-2"
-start_year = 2000
-end_year = 2021
+# term = "Form W-2"
+# start_year = 2000
+# end_year = 2021
+try:
+    term, start_year, end_year = sys.argv[1:]
+except ValueError as e:
+    sys.exit('Invalid input')
 
 driver.get(url)
 search = driver.find_element_by_id("searchFor")

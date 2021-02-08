@@ -17,6 +17,8 @@ def parse_table(html):
 
 def to_json(data, term):
     filtered = [d for d in data if d['form_number'] == term]
+    if not filtered:
+        return None
     min_year = min(f['year'] for f in filtered)
     max_record = max(filtered, key=lambda f: f['year'])
     return {
