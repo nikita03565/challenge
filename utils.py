@@ -1,4 +1,9 @@
 from bs4 import BeautifulSoup
+import json
+
+
+def pretty_print(d: dict):
+    print(json.dumps(d, sort_keys=True, indent=4, default=str))
 
 
 def parse_table(html):

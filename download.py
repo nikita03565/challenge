@@ -36,3 +36,4 @@ for f in filtered:
         f.write(r.content)
 
 driver.close()
+print('done')

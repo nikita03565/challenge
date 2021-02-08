@@ -1,12 +1,24 @@
 made with Python 3.8.5
 
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+Initial setup steps:
+1. python -m venv venv
+2. source venv/bin/activate
+3. pip install -r requirements.txt
 
+Now you can run scripts.
+
+1. "Taking a list of tax form names"
+To run the script use next command:
 python main.py "Form W-2" "Form 1095-C"
+Arguments are space separated. If form name contains space argument must be quoted.
+Output will be pretty printed in console.
 
+2. "Download all PDFs"
+To run the script use next command:
 python download.py "Form W-2" 2015 2021
+Arguments order: Form name, start year, end year.
+Arguments are space separated. If form name contains space argument must be quoted.
+Output will be saved in a folder accordingly to naming rules from task description.
 
 Assumptions that were made:
 - the latest version of title is included in output json

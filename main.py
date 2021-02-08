@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import sys
 
-from utils import parse_table, to_json, get_next_link
+from utils import parse_table, to_json, get_next_link, pretty_print
 
 path = 'C:\Program Files (x86)\Selenium\chromedriver.exe'
 driver = webdriver.Chrome(path)
@@ -26,11 +26,11 @@ for term in search_terms:
         if next_link is None:
             break
         driver.get(next_link)
-    json = to_json(res, term)
-    if json is not None:
-        res_json.append(json)
+    data = to_json(res, term)
+    if data is not None:
+        res_json.append(data)
 
-print(res_json)
+pretty_print(res_json)
 driver.close()
 
 
