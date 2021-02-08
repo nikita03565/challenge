@@ -10,13 +10,13 @@ Now you can run scripts.
 
 1. "Taking a list of tax form names"
 To run the script use next command:
-python main.py "Form W-2" "Form 1095-C"
+python collect_data.py "Form W-2" "Form 1095-C"
 Arguments are space separated. If form name contains space argument must be quoted.
 Output will be pretty printed in console.
 
 2. "Download all PDFs"
 To run the script use next command:
-python download.py "Form W-2" 2015 2021
+python download_pdfs.py "Form W-2" 2015 2021
 Arguments order: Form name, start year, end year.
 Arguments are space separated. If form name contains space argument must be quoted.
 Output will be saved in a folder accordingly to naming rules from task description.
