@@ -1,7 +1,10 @@
+import os
+
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-from utils import parse_table, to_json
+from utils import parse_table
 
 path = 'C:\Program Files (x86)\Selenium\chromedriver.exe'
 driver = webdriver.Chrome(path)
@@ -17,10 +20,10 @@ search.clear()
 search.send_keys(term)
 search.send_keys(Keys.RETURN)
 res = parse_table(driver.page_source)
+filtered = [rec for rec in res if rec['form_number'] == term and start_year <= rec['year'] <= end_year]
 
-links = []
-for rec in res:
-    if rec['form_number'] == term and start_year <= rec['year'] <= end_year + 1:
-        links.append(rec['link'])
-
-print(links)
+os.makedirs(term, exist_ok=True)
+for f in filtered:
+    r = requests.get(f['link'])
+    with open(f'{term}/{f["form_number"]} - {f["year"]}.pdf', 'wb') as f:
+        f.write(r.content)
