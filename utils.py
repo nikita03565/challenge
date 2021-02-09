@@ -42,7 +42,7 @@ def parse_table(html):
         ds = row.find_all('td')
         if len(ds) == 3:
             res.append({
-                'form_number': ds[0].text.strip(), 'title': ds[1].text.strip(), 'year': int(ds[2].text),
+                'form_number': ds[0].text.strip(), 'form_title': ds[1].text.strip(), 'year': int(ds[2].text),
                 'link': ds[0].a['href']
             })
     return res
@@ -76,7 +76,7 @@ def get_dict_data(data, term):
     max_record = max(filtered, key=lambda f: f['year'])
     return {
         'form_number': filtered[0]['form_number'],
-        'title': max_record['title'],
+        'form_title': max_record['form_title'],
         'min_year': min_year,
         'max_year': max_record['year']
     }

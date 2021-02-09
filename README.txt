@@ -19,15 +19,15 @@ Done!
 [
     {
         "form_number": "Form W-2",
+        "form_title": "Wage and Tax Statement (Info Copy Only)"
         "max_year": 2021,
         "min_year": 1954,
-        "title": "Wage and Tax Statement (Info Copy Only)"
     },
     {
         "form_number": "Form 1095-C",
+        "form_title": "Employer-Provided Health Insurance Offer and Coverage"
         "max_year": 2020,
         "min_year": 2014,
-        "title": "Employer-Provided Health Insurance Offer and Coverage"
     }
 ]
 
