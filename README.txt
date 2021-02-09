@@ -10,7 +10,7 @@ Now you can run scripts.
 
 1. "Taking a list of tax form names"
 To run the script use next command:
-python collect_data.py "Form W-2" "Form 1095-C"
+$ python collect_data.py "Form W-2" "Form 1095-C"
 Arguments are space separated. If form name contains space argument must be quoted.
 Output will be pretty printed in console. Sample:
 $ python collect_data.py "Form W-2" "Form 1095-C"
@@ -33,12 +33,13 @@ Done!
 
 2. "Download all PDFs"
 To run the script use next command:
-python download_pdfs.py "Form W-2" 2015 2021
-Arguments order: Form name, start year, end year.
+$ python download_pdfs.py "Form W-2" 2015 2021
+Arguments order: Form name, start year, end year. Arguments after the third are ignored.
 Arguments are space separated. If form name contains space argument must be quoted.
 Output will be saved in a folder accordingly to naming rules from task description and messages "Started..." and "Done!"
 will be printed in console as user's feedback.
 
 Assumptions that were made:
-- the latest version of title is included in output json
-- strict case insensitive equality is used for form name comparison, i.e. if "Form W-2" is given "Form W-2 P" would be ignored
+- the latest version of title is included in output json,
+- strict case insensitive equality is used for form name comparison, i.e. if "Form W-2" is given "Form W-2 P" would be
+  ignored.
