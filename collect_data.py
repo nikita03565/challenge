@@ -1,8 +1,6 @@
 import sys
 
-import requests
-
-from utils import parse_table, get_dict_data, get_next_link, pretty_print, get_page
+from utils import parse_table, get_dict_data, get_next_link, pretty_print, get_page, get_safe
 
 
 def execute():
@@ -17,7 +15,7 @@ def execute():
             next_link = get_next_link(page)
             if next_link is None:
                 break
-            page = requests.get(next_link).content
+            page = get_safe(next_link).content
         data = get_dict_data(res, term)
         if data is not None:
             result.append(data)

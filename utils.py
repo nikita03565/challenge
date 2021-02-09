@@ -1,21 +1,29 @@
 import json
 import os
+import sys
+from urllib import parse
 
 import requests
 from bs4 import BeautifulSoup
-from urllib import parse
-
+from requests.exceptions import BaseHTTPError, ConnectionError
 
 base_url = 'https://apps.irs.gov'
+
+
+def get_safe(url):
+    try:
+        return requests.get(url)
+    except (BaseHTTPError, ConnectionError):
+        sys.exit(f'Failed to access {url}')
 
 
 def get_page(search_term=''):
     value = parse.quote(search_term)
     url = f'{base_url}/app/picklist/list/priorFormPublication.html?value={value}&criteria=formNumber&submitSearch=Find'
-    html_page = requests.get(url).content
+    html_page = get_safe(url).content
     page_size_link = get_largest_page_size_link(html_page)
     if page_size_link:
-        html_page = requests.get(page_size_link).content
+        html_page = get_safe(page_size_link).content
     return html_page
 
 
@@ -77,6 +85,6 @@ def download_pdfs(data):
     dir_name = data[0]['form_number']
     os.makedirs(dir_name, exist_ok=True)
     for pdf_info in data:
-        r = requests.get(pdf_info['link'])
+        response = get_safe(pdf_info['link'])
         with open(f'{dir_name}/{pdf_info["form_number"]} - {pdf_info["year"]}.pdf', 'wb') as file:
-            file.write(r.content)
+            file.write(response.content)

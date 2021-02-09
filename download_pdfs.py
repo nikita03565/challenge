@@ -1,16 +1,20 @@
 import sys
 
-import requests
+from utils import parse_table, get_next_link, get_page, download_pdfs, get_safe
 
-from utils import parse_table, get_next_link, get_page, download_pdfs
+
+def get_args():
+    try:
+        return sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
+    except (ValueError, IndexError) as e:
+        if isinstance(e, IndexError):
+            sys.exit('Invalid input: Not enough arguments, 3 must be given.')
+        sys.exit('Invalid input: Year argument is not a valid integer.')
 
 
 def execute():
     print('Started...')
-    try:
-        term, start, end = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
-    except (ValueError, IndexError) as e:
-        sys.exit(f'Invalid input: {e.args}')
+    term, start, end = get_args()
     page = get_page(term)
     result = []
     while True:
@@ -18,7 +22,7 @@ def execute():
         next_link = get_next_link(page)
         if next_link is None:
             break
-        page = requests.get(next_link).content
+        page = get_safe(next_link).content
     filtered = [rec for rec in result if rec['form_number'].lower() == term.lower() and start <= rec['year'] <= end]
     download_pdfs(filtered)
     print('Done!')
