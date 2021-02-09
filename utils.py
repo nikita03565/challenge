@@ -34,14 +34,17 @@ def pretty_print(data):
 def parse_table(html):
     soup = BeautifulSoup(html, 'lxml')
     table = soup.find('table', {'class': 'picklist-dataTable'})
-    header, *rows = table.find_all('tr')
+    if not table:
+        return []
     res = []
-    for row in rows:
+    rows = table.find_all('tr')
+    for row in rows[1:]:  # skipping header
         ds = row.find_all('td')
-        res.append({
-            'form_number': ds[0].text.strip(), 'title': ds[1].text.strip(), 'year': int(ds[2].text),
-            'link': ds[0].a['href']
-        })
+        if len(ds) == 3:
+            res.append({
+                'form_number': ds[0].text.strip(), 'title': ds[1].text.strip(), 'year': int(ds[2].text),
+                'link': ds[0].a['href']
+            })
     return res
 
 
@@ -83,8 +86,11 @@ def download_pdfs(data):
     if not data:
         return
     dir_name = data[0]['form_number']
-    os.makedirs(dir_name, exist_ok=True)
-    for pdf_info in data:
-        response = get_safe(pdf_info['link'])
-        with open(f'{dir_name}/{pdf_info["form_number"]} - {pdf_info["year"]}.pdf', 'wb') as file:
-            file.write(response.content)
+    try:
+        os.makedirs(dir_name, exist_ok=True)
+        for pdf_info in data:
+            response = get_safe(pdf_info['link'])
+            with open(f'{dir_name}/{pdf_info["form_number"]} - {pdf_info["year"]}.pdf', 'wb') as file:
+                file.write(response.content)
+    except (OSError, PermissionError):
+        sys.exit('Failed to save documents on disc')
