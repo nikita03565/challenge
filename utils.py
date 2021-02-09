@@ -1,5 +1,7 @@
 import json
 import os
+
+import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -80,6 +82,6 @@ def download_pdfs(data):
     dir_name = data[0]['form_number']
     os.makedirs(dir_name, exist_ok=True)
     for pdf_info in data:
-        r = data.get(pdf_info['link'])
+        r = requests.get(pdf_info['link'])
         with open(f'{dir_name}/{pdf_info["form_number"]} - {pdf_info["year"]}.pdf', 'wb') as file:
             file.write(r.content)
