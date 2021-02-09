@@ -3,27 +3,20 @@ import os
 
 import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+from urllib import parse
 
 
-def get_driver(search_term=None, driver_instance=None):
-    if driver_instance is None:
-        driver = webdriver.Chrome()
-        url = 'https://apps.irs.gov/app/picklist/list/priorFormPublication.html'
-        driver.get(url)
-    else:
-        driver = driver_instance
-    if search_term is None:
-        return driver
-    search = driver.find_element_by_id('searchFor')
-    search.clear()
-    search.send_keys(search_term)
-    search.send_keys(Keys.RETURN)
-    page_size_link = get_largest_page_size_link(driver)
+base_url = 'https://apps.irs.gov'
+
+
+def get_page(search_term=''):
+    value = parse.quote(search_term)
+    url = f'{base_url}/app/picklist/list/priorFormPublication.html?value={value}&criteria=formNumber&submitSearch=Find'
+    html_page = requests.get(url).content
+    page_size_link = get_largest_page_size_link(html_page)
     if page_size_link:
-        driver.get(page_size_link)
-    return driver
+        html_page = requests.get(page_size_link).content
+    return html_page
 
 
 def pretty_print(data):
@@ -44,21 +37,23 @@ def parse_table(html):
     return res
 
 
-def get_next_link(driver):
-    pagination = driver.find_elements_by_class_name('paginationBottom')
+def get_next_link(page):
+    soup = BeautifulSoup(page, 'lxml')
+    pagination = soup.find('div', {'class': 'paginationBottom'})
     if not pagination:
         return
-    pagination_links = pagination[0].find_elements_by_tag_name('a')
-    next_link = pagination_links[-1].get_attribute('href') if pagination_links and 'Next' in pagination_links[-1].text else None
+    links = pagination.find_all('a', href=True)
+    next_link = f'{base_url}{links[-1]["href"]}' if links and 'Next' in links[-1].text else None
     return next_link
 
 
-def get_largest_page_size_link(driver):
-    page_size = driver.find_elements_by_class_name('NumResultsDisplayed')
+def get_largest_page_size_link(html_page):
+    soup = BeautifulSoup(html_page, 'lxml')
+    page_size = soup.find('th', {'class': 'NumResultsDisplayed'})
     if not page_size:
         return
-    page_size_links = page_size[0].find_elements_by_tag_name('a')
-    page_size_link = page_size_links[-1].get_attribute('href') if page_size_links and '200' in page_size_links[-1].text else None
+    links = page_size.find_all('a', href=True)
+    page_size_link = f'{base_url}{links[-1]["href"]}' if links and '200' in links[-1].text else None
     return page_size_link
 
 
