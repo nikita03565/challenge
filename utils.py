@@ -1,9 +1,13 @@
+import asyncio
 import json
 import os
 import sys
 from urllib import parse
 
+import aiofiles
+import aiohttp
 import requests
+from aiohttp.client_exceptions import ClientConnectionError
 from bs4 import BeautifulSoup
 from requests.exceptions import BaseHTTPError, ConnectionError
 
@@ -82,15 +86,39 @@ def get_dict_data(data, term):
     }
 
 
-def download_pdfs(data):
+async def fetch_document(pdf_data, session):
+    try:
+        async with session.get(pdf_data['link']) as response:
+            if response.status == 200:
+                r = await response.read()
+                filename = f'{pdf_data["form_number"]}/{pdf_data["form_number"]} - {pdf_data["year"]}.pdf'
+                return r, filename
+            print(f'File {pdf_data["link"]} was not found')
+    except ClientConnectionError:
+        sys.exit(f'Failed to download file from {pdf_data["link"]} because of connection')
+
+
+async def fetch_documents(pdf_data, session):
+    tasks = []
+    for data in pdf_data:
+        task = asyncio.create_task(fetch_document(data, session))
+        tasks.append(task)
+    return await asyncio.gather(*tasks)
+
+
+async def download_pdfs(data):
     if not data:
         return
     dir_name = data[0]['form_number']
     try:
         os.makedirs(dir_name, exist_ok=True)
-        for pdf_info in data:
-            response = get_safe(pdf_info['link'])
-            with open(f'{dir_name}/{pdf_info["form_number"]} - {pdf_info["year"]}.pdf', 'wb') as file:
-                file.write(response.content)
+        async with aiohttp.ClientSession() as session:
+            result = await fetch_documents(data, session)
+            for res in result:
+                if res is not None:
+                    content, filename = res
+                    f = await aiofiles.open(filename, mode='wb')
+                    await f.write(content)
+                    await f.close()
     except (OSError, PermissionError):
         sys.exit('Failed to save documents on disc')

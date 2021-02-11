@@ -1,5 +1,5 @@
 import click
-
+import asyncio
 from utils import parse_table, get_next_link, get_page, download_pdfs, get_safe
 
 help_string = """
@@ -26,7 +26,8 @@ def execute(form, start, end):
             break
         page = get_safe(next_link).content
     filtered = [rec for rec in result if rec['form_number'].lower() == form.lower() and start <= rec['year'] <= end]
-    download_pdfs(filtered)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(download_pdfs(filtered))
     print('Done!')
 
 
