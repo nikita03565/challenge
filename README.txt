@@ -9,6 +9,8 @@ Initial setup steps:
 Now you can run scripts.
 
 1. "Taking a list of tax form names"
+To call help run this command:
+$ python collect_data.py -h (or --help)
 To run the script use next command:
 $ python collect_data.py "Form W-2" "Form 1095-C"
 Arguments are space separated. If form name contains space argument must be quoted.
@@ -32,6 +34,8 @@ Done!
 ]
 
 2. "Download all PDFs"
+To call help run this command:
+$ python download_pdfs.py -h (or --help)
 To run the script use next command:
 $ python download_pdfs.py "Form W-2" 2015 2021
 Arguments order: Form name, start year, end year. Arguments after the third are ignored.

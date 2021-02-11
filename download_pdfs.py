@@ -1,21 +1,23 @@
-import sys
+import click
 
 from utils import parse_table, get_next_link, get_page, download_pdfs, get_safe
 
+help_string = """
+\b
+Searches for given form in years range and downloads pdf documents.
+FORM is a string, must be in double quotes (") if contains spaces.
+START and END are two integers representing range of years to search in.
+Usage example: python download_pdfs.py "Form W-2" 2015 2021
+"""
 
-def get_args():
-    try:
-        return sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
-    except (ValueError, IndexError) as e:
-        if isinstance(e, IndexError):
-            sys.exit('Invalid input: Not enough arguments, 3 must be given.')
-        sys.exit('Invalid input: Year argument is not a valid integer.')
 
-
-def execute():
+@click.command(context_settings=dict(help_option_names=['-h', '--help']), help=help_string)
+@click.argument('form', type=str, nargs=1)
+@click.argument('start', type=int, nargs=1)
+@click.argument('end', type=int, nargs=1)
+def execute(form, start, end):
     print('Started...')
-    term, start, end = get_args()
-    page = get_page(term)
+    page = get_page(form)
     result = []
     while True:
         result.extend(parse_table(page))
@@ -23,7 +25,7 @@ def execute():
         if next_link is None:
             break
         page = get_safe(next_link).content
-    filtered = [rec for rec in result if rec['form_number'].lower() == term.lower() and start <= rec['year'] <= end]
+    filtered = [rec for rec in result if rec['form_number'].lower() == form.lower() and start <= rec['year'] <= end]
     download_pdfs(filtered)
     print('Done!')
 
