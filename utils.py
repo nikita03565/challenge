@@ -72,14 +72,11 @@ def get_largest_page_size_link(html_page):
     return page_size_link
 
 
-def get_dict_data(data, term):
-    filtered = [d for d in data if d['form_number'].lower() == term.lower()]
-    if not filtered:
-        return None
-    min_year = min(f['year'] for f in filtered)
-    max_record = max(filtered, key=lambda f: f['year'])
+def get_dict_data(data):
+    min_year = min(f['year'] for f in data)
+    max_record = max(data, key=lambda f: f['year'])
     return {
-        'form_number': filtered[0]['form_number'],
+        'form_number': data[0]['form_number'],
         'form_title': max_record['form_title'],
         'min_year': min_year,
         'max_year': max_record['year']
@@ -87,15 +84,17 @@ def get_dict_data(data, term):
 
 
 async def fetch_document(pdf_data, session):
+    url = pdf_data['link']
     try:
-        async with session.get(pdf_data['link']) as response:
+        async with session.get(url) as response:
             if response.status == 200:
+                print(f'Downloaded file {url}')
                 r = await response.read()
                 filename = f'{pdf_data["form_number"]}/{pdf_data["form_number"]} - {pdf_data["year"]}.pdf'
                 return r, filename
-            print(f'File {pdf_data["link"]} was not found')
+            print(f'File {url} was not found')
     except ClientConnectionError:
-        sys.exit(f'Failed to download file from {pdf_data["link"]} because of connection')
+        sys.exit(f'Failed to download file from {url} because of connection')
 
 
 async def fetch_documents(pdf_data, session):
@@ -120,5 +119,10 @@ async def download_pdfs(data):
                     f = await aiofiles.open(filename, mode='wb')
                     await f.write(content)
                     await f.close()
+                    print(f'Saved file {filename}')
     except (OSError, PermissionError):
         sys.exit('Failed to save documents on disc')
+
+
+def get_all_found_names(data):
+    return set(d['form_number'] for d in data)

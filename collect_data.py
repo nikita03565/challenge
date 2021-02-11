@@ -1,6 +1,6 @@
 import click
 
-from utils import parse_table, get_dict_data, get_next_link, pretty_print, get_page, get_safe
+from utils import parse_table, get_dict_data, get_next_link, pretty_print, get_page, get_safe, get_all_found_names
 
 help_string = """
 \b
@@ -17,6 +17,7 @@ def execute(search_terms):
     print('Started...')
     result = []
     for term in search_terms:
+        print(f'Processing form name \"{term}\"...')
         res = []
         page = get_page(term)
         while True:
@@ -25,10 +26,18 @@ def execute(search_terms):
             if next_link is None:
                 break
             page = get_safe(next_link).content
-        data = get_dict_data(res, term)
-        if data is not None:
+
+        filtered = [d for d in res if d['form_number'].lower() == term.lower()]
+        if filtered:
+            data = get_dict_data(res)
             result.append(data)
-    print('Done!')
+        found_names = get_all_found_names(res)
+        print(f'Found {len(res)} matches for term \"{term}\"')
+        if found_names:
+            print(f'Names of these matches are: {", ".join(found_names)}')
+            print(f'{len(filtered)} matches left after filtering by name\n')
+
+    print('Done!\nResult is:')
     pretty_print(result)
 
 

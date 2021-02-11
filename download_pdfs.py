@@ -1,6 +1,6 @@
 import click
 import asyncio
-from utils import parse_table, get_next_link, get_page, download_pdfs, get_safe
+from utils import parse_table, get_next_link, get_page, download_pdfs, get_safe, get_all_found_names
 
 help_string = """
 \b
@@ -25,9 +25,18 @@ def execute(form, start, end):
         if next_link is None:
             break
         page = get_safe(next_link).content
+    print(f'Found {len(result)} matches by form name')
     filtered = [rec for rec in result if rec['form_number'].lower() == form.lower() and start <= rec['year'] <= end]
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(download_pdfs(filtered))
+    found_names = get_all_found_names(result)
+    if found_names:
+        print(f'Names of these matches are: {", ".join(found_names)}')
+        print(f'{len(filtered)} matches left after filtering by name and year')
+    if filtered:
+        print(f'Downloading {len(filtered)} documents...')
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(download_pdfs(filtered))
+    else:
+        print('No documents to download')
     print('Done!')
 
 
