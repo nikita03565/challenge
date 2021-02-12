@@ -33,7 +33,7 @@ async def process_term(term, session):
         print(f'Names of these matches are: {", ".join(found_names)}')
         print(f'{len(filtered)} matches left after filtering by name\n')
     if filtered:
-        data = get_dict_data(res)
+        data = get_dict_data(filtered)
         return data
 
 

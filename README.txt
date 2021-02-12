@@ -29,7 +29,7 @@ Done!
 Result is:
 [
     {
-        "form_number": "Form W-2 P",
+        "form_number": "Form W-2",
         "form_title": "Wage and Tax Statement (Info Copy Only)",
         "max_year": 2021,
         "min_year": 1954
