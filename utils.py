@@ -6,28 +6,27 @@ from urllib import parse
 
 import aiofiles
 import aiohttp
-import requests
 from aiohttp.client_exceptions import ClientConnectionError
 from bs4 import BeautifulSoup
-from requests.exceptions import BaseHTTPError, ConnectionError
 
 base_url = 'https://apps.irs.gov'
 
 
-def get_safe(url):
+async def get_safe(url, session):
     try:
-        return requests.get(url)
-    except (BaseHTTPError, ConnectionError):
-        sys.exit(f'Failed to access {url}')
+        async with session.get(url) as response:
+            return await response.read()
+    except ClientConnectionError:
+        sys.exit(f'Failed to load {url} because of connection')
 
 
-def get_page(search_term=''):
+async def get_page(search_term, session):
     value = parse.quote(search_term)
     url = f'{base_url}/app/picklist/list/priorFormPublication.html?value={value}&criteria=formNumber&submitSearch=Find'
-    html_page = get_safe(url).content
+    html_page = await get_safe(url, session)
     page_size_link = get_largest_page_size_link(html_page)
     if page_size_link:
-        html_page = get_safe(page_size_link).content
+        html_page = await get_safe(page_size_link, session)
     return html_page
 
 
@@ -98,10 +97,7 @@ async def fetch_document(pdf_data, session):
 
 
 async def fetch_documents(pdf_data, session):
-    tasks = []
-    for data in pdf_data:
-        task = asyncio.create_task(fetch_document(data, session))
-        tasks.append(task)
+    tasks = [asyncio.create_task(fetch_document(data, session)) for data in pdf_data]
     return await asyncio.gather(*tasks)
 
 
@@ -126,3 +122,7 @@ async def download_pdfs(data):
 
 def get_all_found_names(data):
     return set(d['form_number'] for d in data)
+
+
+def filter_none(lst):
+    return [item for item in lst if item is not None]
