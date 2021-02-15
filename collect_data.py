@@ -47,8 +47,7 @@ async def process_terms(search_terms):
 @click.argument('search_terms', type=str, nargs=-1)
 def execute(search_terms):
     print('Started...')
-    loop = asyncio.get_event_loop()
-    result = filter_none(loop.run_until_complete(process_terms(search_terms)))
+    result = filter_none(asyncio.run(process_terms(search_terms)))
     print('Done!\nResult is:')
     pretty_print(result)
 

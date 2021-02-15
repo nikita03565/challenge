@@ -33,8 +33,7 @@ async def process_term(term):
 @click.argument('end', type=int, nargs=1)
 def execute(form, start, end):
     print('Started...')
-    loop = asyncio.get_event_loop()
-    result = loop.run_until_complete(process_term(form))
+    result = asyncio.run(process_term(form))
     print(f'Found {len(result)} matches by form name')
     filtered = [rec for rec in result if rec['form_number'].lower() == form.lower() and start <= rec['year'] <= end]
     found_names = get_all_found_names(result)
@@ -43,7 +42,7 @@ def execute(form, start, end):
         print(f'{len(filtered)} matches left after filtering by name and year')
     if filtered:
         print(f'Downloading {len(filtered)} documents...')
-        loop.run_until_complete(download_pdfs(filtered))
+        asyncio.run(download_pdfs(filtered))
     else:
         print('No documents to download')
     print('Done!')
